@@ -12,7 +12,15 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
+let compteur = 0;
+app.use((req, res, next) => {
+    if(req.method === 'GET'){
+        compteur++;
+    }
+    console.log('GET COUNTER : ', compteur);
+    next();
+});
+  
 app.use('/films', filmsRouter);
 app.use('/users', usersRouter);
 

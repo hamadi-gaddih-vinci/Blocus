@@ -1,0 +1,29 @@
+### Read all films with File variable
+@baseUrl = http://localhost:3000
+GET {{baseUrl}}/films
+
+### Read all films filtered by minimum-duration
+GET {{baseUrl}}/films?minimum-duration=150
+
+### Read a film with his id
+GET {{baseUrl}}/films/3
+
+### Create a film
+POST {{baseUrl}}/films
+Content-Type: application/json
+
+{
+    "title":"Dragon Ball Z: Broly le SSJL",
+    "duration":160,
+    "budget": 12000000,
+    "link":"https://ibrahim-ayachi-vinci.github.io/covidClicker/"
+}
+
+### Read all films filtered by charDebut
+GET {{baseUrl}}/films?charDebut=Drag
+
+### Read all pizzas sorted by title (ascending)
+GET {{baseUrl}}/films/?order=+title
+
+### Read all pizzas sorted by title (descending)
+GET {{baseUrl}}/films/?order=-title
