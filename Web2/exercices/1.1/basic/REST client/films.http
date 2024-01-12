@@ -13,7 +13,7 @@ POST {{baseUrl}}/films
 Content-Type: application/json
 
 {
-    "title":"Dragon Ball Z: Broly le SSJL",
+    "title":"Dragon Ball Z: 100 plus tard",
     "duration":160,
     "budget": 12000000,
     "link":"https://ibrahim-ayachi-vinci.github.io/covidClicker/"
@@ -22,8 +22,31 @@ Content-Type: application/json
 ### Read all films filtered by charDebut
 GET {{baseUrl}}/films?charDebut=Drag
 
-### Read all pizzas sorted by title (ascending)
+### Read all films sorted by title (ascending)
 GET {{baseUrl}}/films/?order=+title
 
-### Read all pizzas sorted by title (descending)
+### Read all films sorted by title (descending)
 GET {{baseUrl}}/films/?order=-title
+
+### Delete film identified by 2
+DELETE {{baseUrl}}/films/3
+
+### Update the film identified by 1
+PATCH {{baseUrl}}/films/1
+Content-Type: application/json
+
+{
+    "title":"Dragon Ball Z: Les mercenaires de l'espace"
+}
+
+### Update the pizza identified by 6
+PUT {{baseUrl}}/pizzas/9
+Content-Type: application/json
+
+{
+    "title":"Dragon Ball Z: picollo daimao",
+    "duration":160,
+    "budget": 12000000,
+    "link":"https://ibrahim-ayachi-vinci.github.io/covidClicker/"
+}
+

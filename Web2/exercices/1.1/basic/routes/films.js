@@ -44,9 +44,12 @@ router.get('/', (req, res, next) => {
 
   const orderByTitle = req?.query?.order?.includes('title') ? req.query.order : undefined;
 
+
+  //if(!filtredByCharDebut && !filtredByMinimumFilmDuration && !orderByTitle) return res.sendStatus(400);
+
   if(filtredByMinimumFilmDuration){
     if(typeof filtredByMinimumFilmDuration !== 'number' || filtredByMinimumFilmDuration <= 0)
-      return res.json('Wrong minimum duration');
+      return res.sendStatus(400);
 
   orderedMenu = [...MENU].filter(
     (film) => film.duration >= filtredByMinimumFilmDuration
@@ -93,6 +96,9 @@ router.post('/', (req, res) => {
 
   if (!title || !duration || !budget || !link) return res.sendStatus(400); // error code '400 Bad request'
 
+  const existingfilm = MENU.find(film => film.title.toLowerCase() == title.toLowerCase());
+  if(existingfilm) return res.sendStatus(409);
+
   const newFilm = {
     id: id,
     title: title,
@@ -106,4 +112,82 @@ router.post('/', (req, res) => {
   res.json(newFilm);
 });
 
-  module.exports = router;
+
+  router.delete('/:id', (req,res) => {
+    console.log(`DELETE /films/${req.params.id}`);
+    const idDelete = MENU.findIndex(film => film.id == req.params.id);
+
+    if(idDelete < 0) return res.sendStatus(400);
+
+    const filmsRemovedFromMenu = MENU.splice(idDelete, 1);
+    const filmRemoved = filmsRemovedFromMenu[0];
+
+    res.json(filmRemoved);
+  });
+
+  router.patch('/:id', (req, res) => {
+    console.log(`PATCH /films/${req.params.id}`);
+    
+    const indexOfFilmFound = MENU.findIndex(film => film.id == req.params.id);
+
+    if(indexOfFilmFound < 0) return res.sendStatus(400);
+
+    const title = req?.body?.title;
+    const duration = req?.body?.duration;
+    const budget = req?.body?.budget;
+    const link = req?.body?.link;
+
+    if((!title && !duration && !budget && !link) || title?.length === 0 || duration?.length === 0 || budget?.length === 0 || link?.length === 0) return res.sendStatus(400);
+
+    const updatedFilm = {...MENU[indexOfFilmFound], ...req.body};
+
+    MENU[indexOfFilmFound] = updatedFilm;
+
+    res.json(updatedFilm);
+  });
+
+  router.put('/:id', (req, res) => {
+    console.log(`PUT /films/${req.params.id}`);
+
+    const title = req?.body?.title;
+    const link = req?.body?.link;
+    const duration = req?.body?.duration;
+    const budget = req?.body?.budget;
+    
+    if (
+      !req.body ||
+      !title ||
+      !title.trim() ||
+      !link ||
+      !link.trim() ||
+      duration === undefined ||
+      typeof req?.body?.duration !== 'number' ||
+      duration < 0 ||
+      budget === undefined ||
+      typeof req?.body?.budget !== 'number' ||
+      budget < 0
+    ) return res.sendStatus(400);
+
+    const id = req.params.id;
+    const indexOfFilmFound = film.findIndex((film) => film.id == id);
+
+    if(indexOfFilmFound < 0){
+      const newFilm = {id, title, link, duration, budget};
+      MENU.push(newFilm);
+      return res.json(newFilm);
+    }
+
+    const filmAvantChangement = MENU[indexOfFilmFound];
+    const objetContenantLesPropriétésAMettreAJour = req.body;
+
+    const updatedFilm = {
+      ...filmAvantChangement,
+      ...objetContenantLesPropriétésAMettreAJour,
+    };
+
+    MENU[indexOfFilmFound] = updatedFilm;
+    
+    return res.json(updatedFilm);
+  });
+
+module.exports = router;
