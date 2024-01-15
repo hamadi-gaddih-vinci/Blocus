@@ -29,32 +29,31 @@ const MENU = [
   },
 ];
 
-// Read all the pizzas from the menu
+/* Read all the pizzas from the menu
+   GET /pizzas?order=title : ascending order by title
+   GET /pizzas?order=-title : descending order by title
+*/
 router.get('/', (req, res, next) => {
   const orderByTitle =
-    req?.query?.order?.includes('title')
-      ? req.query.order
-      : undefined;
+    req?.query?.order?.includes('title') ? req.query.order : undefined;
   let orderedMenu;
   console.log(`order by ${orderByTitle ?? 'not requested'}`);
-  if (orderByTitle)
-    orderedMenu = [...MENU].sort((a, b) => a.title.localeCompare(b.title));
+  if (orderByTitle) orderedMenu = [...MENU].sort((a, b) => a.title.localeCompare(b.title));
   if (orderByTitle === '-title') orderedMenu = orderedMenu.reverse();
 
   console.log('GET /pizzas');
-  res.json(orderedMenu ?? MENU);
+  return res.json(orderedMenu ?? MENU);
 });
-
 
 // Read the pizza identified by an id in the menu
 router.get('/:id', (req, res) => {
   console.log(`GET /pizzas/${req.params.id}`);
 
-  const indexOfPizzaFound = MENU.findIndex((pizza) => pizza.id == req.params.id);
+  const indexOfPizzaFound = MENU.findIndex(pizza => pizza.id == req.params.id);
 
   if (indexOfPizzaFound < 0) return res.sendStatus(404);
 
-  res.json(MENU[indexOfPizzaFound]);
+  return res.json(MENU[indexOfPizzaFound]);
 });
 
 // Create a pizza to be added to the menu.
@@ -78,7 +77,43 @@ router.post('/', (req, res) => {
 
   MENU.push(newPizza);
 
-  res.json(newPizza);
+  return res.json(newPizza);
+});
+
+// Delete a pizza from the menu based on its id
+router.delete('/:id', (req, res) => {
+  console.log(`DELETE /pizzas/${req.params.id}`);
+
+  const foundIndex = MENU.findIndex(pizza => pizza.id == req.params.id);
+
+  if (foundIndex < 0) return res.sendStatus(404);
+
+  const itemsRemovedFromMenu = MENU.splice(foundIndex, 1);
+  const itemRemoved = itemsRemovedFromMenu[0];
+
+  return res.json(itemRemoved);
+});
+
+// Update a pizza based on its id and new values for its parameters
+router.patch('/:id', (req, res) => {
+  console.log(`PATCH /pizzas/${req.params.id}`);
+
+  const title = req?.body?.title;
+  const content = req?.body?.content;
+
+  console.log('POST /pizzas');
+
+  if ((!title && !content) || title?.length === 0 || content?.length === 0) return res.sendStatus(400);
+
+  const foundIndex = MENU.findIndex(pizza => pizza.id == req.params.id);
+
+  if (foundIndex < 0) return res.sendStatus(404);
+
+  const updatedPizza = {...MENU[foundIndex], ...req.body};
+
+  MENU[foundIndex] = updatedPizza;
+
+  return res.json(updatedPizza);
 });
 
 module.exports = router;
